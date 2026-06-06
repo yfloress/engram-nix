@@ -1,0 +1,36 @@
+name: Update engram
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+# Allow the job to commit the bump
+permissions:
+  contents: write
+
+concurrency:
+  group: update-engram
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Configure git author
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump engram to latest release
+        run: nix run nixpkgs#nix-update -- --flake --version=stable --commit engram
+
+      - name: Push
+        run: git push
