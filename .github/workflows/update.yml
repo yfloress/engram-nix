@@ -29,8 +29,15 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # Upstream also tags pi-v* and v2.0.0-rc.* in the same repo; the atom
+      # feed only shows the last 10, so use the releases API and match vX.Y.Z.
       - name: Bump engram to latest release
-        run: nix run nixpkgs#nix-update -- --flake --version=stable --commit engram
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          nix run nixpkgs#nix-update -- --flake --commit
+          --version=stable --use-github-releases
+          --version-regex '^v(\d+\.\d+\.\d+)$' engram
 
       - name: Push
         run: git push
