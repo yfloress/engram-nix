@@ -29,6 +29,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # Keep nixpkgs fresh: upstream bumps its go.mod Go version.
+      - name: Update flake inputs
+        run: |
+          nix flake update
+          git diff --quiet flake.lock || git commit -m "flake.lock: update nixpkgs" flake.lock
+
       # Upstream also tags pi-v* and v2.0.0-rc.* in the same repo; the atom
       # feed only shows the last 10, so use the releases API and match vX.Y.Z.
       - name: Bump engram to latest release
