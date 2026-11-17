@@ -31,9 +31,15 @@ Pull new versions with your usual `nix flake update` + rebuild.
 
 ## How updates work
 
-A scheduled GitHub Actions workflow runs `nix-update` daily, bumping the package
-to the latest Engram release and committing the new version and hashes
-automatically — no manual maintenance.
+A scheduled GitHub Actions workflow refreshes nixpkgs and runs
+`nix run .#engram-updater` daily. The updater uses the nixpkgs revision in
+`flake.lock`, selects stable `vX.Y.Z` releases, and builds Engram before
+committing the new version and hashes.
+
+The updater carries `nix-update-prefetch.patch` because nix-update 1.16 assumes
+`nix flake metadata` copies sources into the store. Nix 2.35 defers that copy;
+the patch explicitly prefetches the exact source on every evaluation, including
+after edits. Remove the patch once the locked nix-update includes this fix.
 
 ## License
 

@@ -42,6 +42,11 @@
         in
         {
           inherit engram;
+          # nix-update 1.16 assumes metadata copies sources to the store.
+          # Nix >= 2.35 requires an explicit prefetch before getFlake.
+          engram-updater = pkgs.nix-update.overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [ ./nix-update-prefetch.patch ];
+          });
           default = engram;
         });
     };

@@ -1,0 +1,19 @@
+--- a/nix_update/options.py
++++ b/nix_update/options.py
+@@ -120,6 +120,16 @@
+         if not isinstance(path, str):
+             return None
+
++        # Since Nix 2.35, metadata can return a path that is not in the
++        # store yet. Materialize the exact source before another process
++        # uses it via builtins.getFlake. Repeat after each source change.
++        subprocess.run(
++            ["nix", "flake", "prefetch", "--json", metadata["url"]],
++            cwd=import_path,
++            capture_output=True,
++            text=True,
++            check=True,
++        )
+         flake_dir = _metadata_flake_dir(metadata)
+         if flake_dir:
+             return str(Path(path) / flake_dir)

@@ -41,7 +41,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: >
-          nix run nixpkgs#nix-update -- --flake --commit
+          nix run .#engram-updater -- --flake --build --commit
           --version=stable --use-github-releases
           --version-regex '^v(\d+\.\d+\.\d+)$' engram
 
